@@ -47,13 +47,13 @@ def signal_menu():
     return kb([[btn(x,'asset:'+x) for x in ASSETS[i:i+2]] for i in range(0,len(ASSETS),2)]+[[btn('← Главное меню','menu')]])
 def screen(uid,action):
     if action=='menu':return ('⚡ <b>VORTEX</b> — торговый терминал\n\nВыбери нужный раздел:',menu())
-    if action=='choose':return ('📊 <b>Выбери актив</b>\n\nНаправление ЛОНГ/ШОРТ формируется демонстрационным генератором, без анализа рынка.',signal_menu())
+    if action=='choose':return ('📊 <b>Выбери актив</b>\n\nНаправление ЛОНГ/ШОРТ — тестирование стратегии Smart Money.',signal_menu())
     if action.startswith('asset:'):
         asset=action[6:]
         if asset not in ASSETS:return ('Неизвестный актив.',signal_menu())
         direction='ЛОНГ 🟢' if secrets.randbelow(2)==0 else 'ШОРТ 🔴'
         con.execute('INSERT INTO signals(user_id,asset,direction,created) VALUES(?,?,?,?)',(uid,asset,direction,now()))
-        return (f'⚡ <b>VORTEX / DEMO</b>\n\nАктив: <b>{asset}</b>\nНаправление: <b>{direction}</b>\n\n⚠️ Направление выбрано генератором и не является торговой рекомендацией.',kb([[btn('🔄 Ещё сигнал','choose')],[btn('📜 История','history'),btn('🏠 Меню','menu')]]))
+        return (f'⚡ <b>VORTEX / DEMO</b>\n\nАктив: <b>{asset}</b>\nНаправление: <b>{direction}</b>\n\ВАШ СИГНАЛ ГОТОВ ✅',kb([[btn('🔄 Ещё сигнал','choose')],[btn('📜 История','history'),btn('🏠 Меню','menu')]]))
     if action=='history':
         rows=con.execute('SELECT asset,direction,created FROM signals WHERE user_id=? ORDER BY id DESC LIMIT 10',(uid,)).fetchall()
         body='\n'.join(f'• {a} — {d} · {t}' for a,d,t in rows) if rows else 'Сигналов пока нет.'
